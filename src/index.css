@@ -1,0 +1,52 @@
+:root {
+  --bg: #071227;
+  --bg-soft: #10213f;
+  --text: #ecf2ff;
+  --text-muted: #b3c0dc;
+  --line: rgba(255, 255, 255, 0.14);
+  --danger: #ff5d6d;
+  --ok: #29d396;
+  --font-display: 'Rajdhani', 'Orbitron', 'Segoe UI', sans-serif;
+  --font-body: 'Exo 2', 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(76, 173, 255, 0.18), transparent 36%),
+    radial-gradient(circle at 84% 8%, rgba(57, 255, 195, 0.14), transparent 30%),
+    linear-gradient(135deg, var(--bg), #060d1b 55%, #03060d);
+}
+
+body.obs-mode {
+  background: transparent;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+button,
+.eyebrow,
+.hf-rarity-pill {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+a {
+  color: inherit;
+}
