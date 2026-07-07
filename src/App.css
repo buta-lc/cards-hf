@@ -51,6 +51,7 @@
 }
 
 .hf-card-border,
+.hf-card-border-sheen,
 .hf-card-sweep,
 .hf-card-flash,
 .hf-card-particles,
@@ -91,6 +92,31 @@
 
 .hf-card-border::after {
   background: var(--border-shimmer);
+  opacity: 0;
+}
+
+.hf-card-border-sheen {
+  padding: 3px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  overflow: hidden;
+}
+
+.hf-card-border-sheen::before {
+  content: '';
+  position: absolute;
+  top: -18%;
+  bottom: -18%;
+  width: 60%;
+  left: -72%;
+  background: linear-gradient(
+    112deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.88),
+    rgba(255, 255, 255, 0)
+  );
+  transform: skewX(-22deg) translateX(0);
   opacity: 0;
 }
 
@@ -336,50 +362,59 @@
 
 .rarity-rare .hf-card-border {
   --border-base: linear-gradient(135deg, #1d7ece, #76c6ff 42%, #1d7ece);
-  --border-shimmer: conic-gradient(
-    from 0deg,
-    rgba(255, 255, 255, 0) 0deg,
-    rgba(176, 230, 255, 0.9) 16deg,
-    rgba(255, 255, 255, 0) 46deg,
-    rgba(255, 255, 255, 0) 360deg
+  --border-shimmer: linear-gradient(
+    135deg,
+    rgba(121, 205, 255, 0.2),
+    rgba(121, 205, 255, 0.6),
+    rgba(121, 205, 255, 0.2)
   );
 }
 
 .rarity-epique .hf-card-border {
   --border-base: linear-gradient(135deg, #7d3dd9, #d39dff 42%, #7d3dd9);
-  --border-shimmer: conic-gradient(
-    from 0deg,
-    rgba(255, 255, 255, 0) 0deg,
-    rgba(232, 205, 255, 0.92) 15deg,
-    rgba(255, 255, 255, 0) 45deg,
-    rgba(255, 255, 255, 0) 360deg
+  --border-shimmer: linear-gradient(
+    135deg,
+    rgba(220, 184, 255, 0.2),
+    rgba(220, 184, 255, 0.7),
+    rgba(220, 184, 255, 0.2)
   );
 }
 
 .rarity-legendaire .hf-card-border {
   --border-base: linear-gradient(135deg, #7f5a1f, #ffe29c 40%, #7f5a1f);
-  --border-shimmer: conic-gradient(
-    from 0deg,
-    rgba(255, 255, 255, 0) 0deg,
-    rgba(255, 245, 199, 0.95) 14deg,
-    rgba(255, 255, 255, 0) 44deg,
-    rgba(255, 255, 255, 0) 360deg
+  --border-shimmer: linear-gradient(
+    135deg,
+    rgba(255, 236, 186, 0.2),
+    rgba(255, 236, 186, 0.75),
+    rgba(255, 236, 186, 0.2)
   );
 }
 
 .rarity-rare.is-flipped .hf-card-border::after {
   opacity: 0.5;
-  animation: border-spin 3s linear infinite;
+}
+
+.rarity-rare.is-flipped .hf-card-border-sheen::before {
+  opacity: 0.66;
+  animation: border-sheen-pass 3.2s linear infinite;
 }
 
 .rarity-epique .hf-card-border::after {
-  opacity: 0.7;
-  animation: border-spin 2.1s linear infinite;
+  opacity: 0.68;
+}
+
+.rarity-epique .hf-card-border-sheen::before {
+  opacity: 0.75;
+  animation: border-sheen-pass 2.2s linear infinite;
 }
 
 .rarity-legendaire .hf-card-border::after {
-  opacity: 0.85;
-  animation: border-spin 1.6s linear infinite;
+  opacity: 0.82;
+}
+
+.rarity-legendaire .hf-card-border-sheen::before {
+  opacity: 0.9;
+  animation: border-sheen-pass 1.6s linear infinite;
 }
 
 .rarity-rare.is-reveal-animating .hf-card-flash {
@@ -441,6 +476,7 @@
   .hf-card-inner,
   .hf-card.is-reveal-animating .hf-card-inner,
   .hf-card-border::after,
+  .hf-card-border-sheen::before,
   .ambient-dot,
   .rarity-rare.is-flipped .hf-card-face,
   .rarity-legendaire .hf-card-ray-layer {
@@ -543,13 +579,19 @@
   }
 }
 
-@keyframes border-spin {
+@keyframes border-sheen-pass {
   0% {
-    transform: rotate(0deg) scale(1);
+    transform: skewX(-22deg) translateX(0);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
   }
 
   100% {
-    transform: rotate(360deg) scale(1);
+    transform: skewX(-22deg) translateX(330%);
+    opacity: 0;
   }
 }
 

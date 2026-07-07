@@ -101,6 +101,7 @@ export default function Card({ attribution, backOnly = false, className = '' }) 
       } ${className}`.trim()}
     >
       <div className="hf-card-border" aria-hidden="true"></div>
+      <div className="hf-card-border-sheen" aria-hidden="true"></div>
       <div className="hf-card-sweep" aria-hidden="true"></div>
       <div className="hf-card-flash" aria-hidden="true"></div>
       <div className="hf-card-ray-layer" aria-hidden="true">
