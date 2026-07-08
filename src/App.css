@@ -48,6 +48,11 @@
   gap: 10px;
   margin-bottom: 14px;
   flex-wrap: wrap;
+  align-items: end;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: linear-gradient(150deg, rgba(9, 20, 40, 0.82), rgba(7, 14, 28, 0.7));
 }
 
 .sort-toolbar label {
@@ -85,11 +90,21 @@
   place-items: center;
   z-index: 15;
   pointer-events: none;
+  animation: stage-focus-in 260ms ease-out 1;
+}
+
+.reveal-focus-stage::before {
+  content: '';
+  position: absolute;
+  inset: -12%;
+  background: radial-gradient(circle, rgba(86, 151, 255, 0.22), rgba(5, 9, 20, 0.76));
+  opacity: 0.86;
 }
 
 .focused-reveal-card {
   width: min(420px, 92vw);
   height: min(560px, 82vh);
+  filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.5));
 }
 
 .card-stack-item {
@@ -117,6 +132,7 @@
 .hf-card-sweep,
 .hf-card-flash,
 .hf-card-hype-glow,
+.hf-reveal-burst,
 .hf-card-particles,
 .hf-card-ray-layer {
   position: absolute;
@@ -230,6 +246,25 @@
   transform: scale(0.9);
 }
 
+.hf-reveal-burst {
+  inset: -12%;
+  opacity: 0;
+}
+
+.hf-reveal-burst::before,
+.hf-reveal-burst::after {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.62);
+  opacity: 0;
+}
+
+.hf-reveal-burst::after {
+  inset: 18%;
+}
+
 .hf-card-hype-glow {
   position: absolute;
   inset: -10%;
@@ -255,8 +290,9 @@
   background: var(--particle-color);
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   opacity: 0;
-  transform: translate3d(0, 0, 0) scale(0.35);
+  transform: translate3d(0, 0, 0) scale(0.35) rotate(0deg);
   animation: particle-burst var(--dur) ease-out var(--delay) 1;
+  filter: drop-shadow(0 0 7px var(--particle-color));
 }
 
 .hf-card-ray-layer {
@@ -545,6 +581,18 @@
   animation: hype-window 300ms ease-out 1;
 }
 
+.hf-card.is-reveal-animating .hf-reveal-burst {
+  opacity: 1;
+}
+
+.hf-card.is-reveal-animating .hf-reveal-burst::before {
+  animation: burst-ring-a 520ms ease-out 1;
+}
+
+.hf-card.is-reveal-animating .hf-reveal-burst::after {
+  animation: burst-ring-b 620ms ease-out 1;
+}
+
 .hf-card.is-reveal-animating .hf-card-inner {
   transition: none;
 }
@@ -582,11 +630,11 @@
   }
 
   10% {
-    transform: rotateY(0deg) scale(0.97) translateX(-2px);
+    transform: rotateY(0deg) scale(0.95) translateX(-4px);
   }
 
   16% {
-    transform: rotateY(0deg) scale(0.97) translateX(2px);
+    transform: rotateY(0deg) scale(0.95) translateX(4px);
   }
 
   18% {
@@ -594,11 +642,11 @@
   }
 
   76% {
-    transform: rotateY(180deg) scale(0.97) translateX(0);
+    transform: rotateY(180deg) scale(0.95) translateX(0);
   }
 
   88% {
-    transform: rotateY(180deg) scale(1.05) translateX(0);
+    transform: rotateY(180deg) scale(1.08) translateX(0);
   }
 
   100% {
@@ -715,7 +763,51 @@
 
   100% {
     opacity: 0;
-    transform: translate3d(var(--tx), var(--ty), 0) scale(1.1);
+    transform: translate3d(var(--tx), var(--ty), 0) scale(1.2) rotate(var(--rz));
+  }
+}
+
+@keyframes burst-ring-a {
+  0% {
+    opacity: 0;
+    transform: scale(0.68);
+  }
+
+  30% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes burst-ring-b {
+  0% {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+
+  45% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes stage-focus-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -861,6 +953,30 @@ button {
   color: var(--text);
   padding: 10px 12px;
   font: inherit;
+}
+
+.sort-toolbar select,
+.admin-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%23b8cff5' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, right 12px center;
+  background-size: 100% 100%, 10px 6px;
+  border-color: rgba(131, 200, 255, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  padding-right: 34px;
+}
+
+.sort-toolbar select:focus,
+.admin-form select:focus {
+  outline: none;
+  border-color: rgba(131, 200, 255, 0.75);
+  box-shadow:
+    0 0 0 2px rgba(86, 151, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 button {

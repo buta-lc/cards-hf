@@ -30,21 +30,37 @@ function normalizeBackStyle(backStyle) {
 }
 
 function createRevealParticles(rarity) {
-  if (rarity !== 'epique' && rarity !== 'legendaire') {
+  if (rarity !== 'rare' && rarity !== 'epique' && rarity !== 'legendaire') {
     return []
   }
 
-  const count = rarity === 'legendaire' ? 14 : 10
-  const color = rarity === 'legendaire' ? 'rgba(255, 211, 105, 0.95)' : 'rgba(196, 113, 255, 0.95)'
+  const count = rarity === 'legendaire' ? 20 : rarity === 'epique' ? 14 : 8
+  const color =
+    rarity === 'legendaire'
+      ? 'rgba(255, 211, 105, 0.95)'
+      : rarity === 'epique'
+        ? 'rgba(196, 113, 255, 0.95)'
+        : 'rgba(110, 206, 255, 0.95)'
 
   return Array.from({ length: count }).map((_, index) => {
     const angle = Math.random() * Math.PI * 2
-    const distance = rarity === 'legendaire' ? 145 + Math.random() * 80 : 100 + Math.random() * 65
+    const distance =
+      rarity === 'legendaire'
+        ? 180 + Math.random() * 90
+        : rarity === 'epique'
+          ? 130 + Math.random() * 75
+          : 95 + Math.random() * 45
     const tx = Math.cos(angle) * distance
     const ty = Math.sin(angle) * distance
-    const duration = 620 + Math.floor(Math.random() * 320)
-    const delay = Math.floor(Math.random() * 120)
-    const size = rarity === 'legendaire' ? 10 + Math.floor(Math.random() * 7) : 8 + Math.floor(Math.random() * 6)
+    const duration = 700 + Math.floor(Math.random() * 420)
+    const delay = Math.floor(Math.random() * 150)
+    const size =
+      rarity === 'legendaire'
+        ? 14 + Math.floor(Math.random() * 10)
+        : rarity === 'epique'
+          ? 11 + Math.floor(Math.random() * 8)
+          : 9 + Math.floor(Math.random() * 6)
+    const rotate = -65 + Math.floor(Math.random() * 130)
 
     return {
       id: `${Date.now()}-${index}`,
@@ -54,6 +70,7 @@ function createRevealParticles(rarity) {
       delay,
       size,
       color,
+      rotate,
     }
   })
 }
@@ -135,6 +152,7 @@ export default function Card({
       <div className="hf-card-sweep" aria-hidden="true"></div>
       <div className="hf-card-flash" aria-hidden="true"></div>
       <div className="hf-card-hype-glow" aria-hidden="true"></div>
+      <div className="hf-reveal-burst" aria-hidden="true"></div>
       <div className="hf-card-ray-layer" aria-hidden="true">
         <span className="hf-card-ray"></span>
         <span className="hf-card-ray"></span>
@@ -152,6 +170,7 @@ export default function Card({
               '--delay': `${particle.delay}ms`,
               '--size': `${particle.size}px`,
               '--particle-color': particle.color,
+              '--rz': `${particle.rotate}deg`,
             }}
             onAnimationEnd={() => {
               setParticles((current) => current.filter((item) => item.id !== particle.id))
