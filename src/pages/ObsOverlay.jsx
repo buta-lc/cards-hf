@@ -22,8 +22,9 @@ export default function ObsOverlay() {
     revealAudioRef.current.play().catch(() => {})
   }, [])
 
-  const { focusedReveal, revealSignal, isFocusMode } = useRevealFocus(sortedItems, {
+  const { focusedReveal, revealSignal, isFocusMode, focusPhase } = useRevealFocus(sortedItems, {
     displayMs: 5000,
+    hideMs: 420,
     onReveal,
   })
 
@@ -63,7 +64,10 @@ export default function ObsOverlay() {
         </section>
 
         {focusedReveal ? (
-          <section className="reveal-focus-stage" aria-label="Reveal en direct">
+          <section
+            className={`reveal-focus-stage ${focusPhase === 'hide' ? 'is-leaving' : ''}`}
+            aria-label="Reveal en direct"
+          >
             <Card
               key={`${focusedReveal.id}-${revealSignal}`}
               attribution={focusedReveal}

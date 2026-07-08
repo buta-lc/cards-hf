@@ -52,8 +52,8 @@ function createRevealParticles(rarity) {
           : 95 + Math.random() * 45
     const tx = Math.cos(angle) * distance
     const ty = Math.sin(angle) * distance
-    const duration = 700 + Math.floor(Math.random() * 420)
-    const delay = Math.floor(Math.random() * 150)
+    const duration = 1100 + Math.floor(Math.random() * 560)
+    const delay = 320 + Math.floor(Math.random() * 260)
     const size =
       rarity === 'legendaire'
         ? 14 + Math.floor(Math.random() * 10)
@@ -114,15 +114,15 @@ export default function Card({
 
       const revealDoneTimeout = window.setTimeout(() => {
         setIsRevealAnimating(false)
-      }, 850)
+      }, 1700)
 
       const hypeStartTimeout = window.setTimeout(() => {
         setIsHypeWindow(true)
-      }, 850)
+      }, 1700)
 
       const hypeStopTimeout = window.setTimeout(() => {
         setIsHypeWindow(false)
-      }, 1150)
+      }, 2000)
 
       previousRevealed.current = true
       previousRevealSignal.current = revealSignal
@@ -206,6 +206,13 @@ export default function Card({
         </section>
 
         <section className="hf-card-face hf-card-front">
+          <div className="hf-card-front-backhint" aria-hidden="true">
+            {backStyle.image_url ? (
+              <img src={backStyle.image_url} alt="" className="hf-card-front-backhint-image" />
+            ) : (
+              <span className="hf-card-front-backhint-icon">{backStyle.icon}</span>
+            )}
+          </div>
           <div className="hf-card-front-head">
             <p className="hf-rarity-pill">{rarity}</p>
             <h3>{title}</h3>

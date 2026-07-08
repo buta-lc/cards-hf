@@ -2,13 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 
 export function useRevealFocus(items, options = {}) {
   const displayMs = options.displayMs || 5000
+  const hideMs = options.hideMs || 380
   const onReveal = options.onReveal
 
   const [focusedReveal, setFocusedReveal] = useState(null)
   const [revealSignal, setRevealSignal] = useState(0)
+  const [focusPhase, setFocusPhase] = useState('idle')
 
   const previousMapRef = useRef(new Map())
-  const timerRef = useRef(null)
+  const showTimerRef = useRef(null)
+  const hideTimerRef = useRef(null)
 
   useEffect(() => {
     let nextReveal = null
@@ -34,6 +37,7 @@ export function useRevealFocus(items, options = {}) {
     }
 
     setFocusedReveal(nextReveal)
+    setFocusPhase('show')
     const nextSignal = Date.now()
     setRevealSignal(nextSignal)
 
@@ -41,20 +45,32 @@ export function useRevealFocus(items, options = {}) {
       onReveal(nextReveal)
     }
 
-    if (timerRef.current) {
-      window.clearTimeout(timerRef.current)
+    if (showTimerRef.current) {
+      window.clearTimeout(showTimerRef.current)
     }
 
-    timerRef.current = window.setTimeout(() => {
-      setFocusedReveal(null)
-      timerRef.current = null
+    if (hideTimerRef.current) {
+      window.clearTimeout(hideTimerRef.current)
+    }
+
+    showTimerRef.current = window.setTimeout(() => {
+      setFocusPhase('hide')
+      hideTimerRef.current = window.setTimeout(() => {
+        setFocusedReveal(null)
+        setFocusPhase('idle')
+        hideTimerRef.current = null
+      }, hideMs)
+      showTimerRef.current = null
     }, displayMs)
-  }, [items, displayMs, onReveal])
+  }, [items, displayMs, hideMs, onReveal])
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) {
-        window.clearTimeout(timerRef.current)
+      if (showTimerRef.current) {
+        window.clearTimeout(showTimerRef.current)
+      }
+      if (hideTimerRef.current) {
+        window.clearTimeout(hideTimerRef.current)
       }
     }
   }, [])
@@ -62,6 +78,7 @@ export function useRevealFocus(items, options = {}) {
   return {
     focusedReveal,
     revealSignal,
-    isFocusMode: Boolean(focusedReveal),
+    focusPhase,
+    isFocusMode: focusPhase !== 'idle',
   }
 }
