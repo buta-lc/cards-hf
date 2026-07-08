@@ -58,7 +58,12 @@ function createRevealParticles(rarity) {
   })
 }
 
-export default function Card({ attribution, backOnly = false, className = '' }) {
+export default function Card({
+  attribution,
+  backOnly = false,
+  className = '',
+  revealSignal = 0,
+}) {
   const {
     title,
     description,
@@ -76,34 +81,60 @@ export default function Card({ attribution, backOnly = false, className = '' }) 
   )
 
   const previousRevealed = useRef(revealed)
+  const previousRevealSignal = useRef(revealSignal)
   const [isRevealAnimating, setIsRevealAnimating] = useState(false)
+  const [isHypeWindow, setIsHypeWindow] = useState(false)
   const [particles, setParticles] = useState([])
 
   useEffect(() => {
-    if (!previousRevealed.current && revealed) {
+    const signalTriggered =
+      Boolean(revealSignal) && previousRevealSignal.current !== revealSignal && revealed
+
+    if ((!previousRevealed.current && revealed) || signalTriggered) {
       setIsRevealAnimating(true)
+      setIsHypeWindow(false)
       setParticles(createRevealParticles(rarity))
-      const timeout = window.setTimeout(() => {
+
+      const revealDoneTimeout = window.setTimeout(() => {
         setIsRevealAnimating(false)
-      }, 900)
+      }, 850)
+
+      const hypeStartTimeout = window.setTimeout(() => {
+        setIsHypeWindow(true)
+      }, 850)
+
+      const hypeStopTimeout = window.setTimeout(() => {
+        setIsHypeWindow(false)
+      }, 1150)
+
       previousRevealed.current = true
-      return () => window.clearTimeout(timeout)
+      previousRevealSignal.current = revealSignal
+
+      return () => {
+        window.clearTimeout(revealDoneTimeout)
+        window.clearTimeout(hypeStartTimeout)
+        window.clearTimeout(hypeStopTimeout)
+      }
     }
 
     previousRevealed.current = revealed
+    previousRevealSignal.current = revealSignal
     return undefined
-  }, [revealed])
+  }, [revealed, rarity, revealSignal])
 
   return (
     <article
       className={`hf-card rarity-${rarity} ${revealed ? 'is-flipped' : ''} ${
         isRevealAnimating ? 'is-reveal-animating' : ''
+      } ${
+        isHypeWindow ? 'is-hype-window' : ''
       } ${className}`.trim()}
     >
       <div className="hf-card-border" aria-hidden="true"></div>
       <div className="hf-card-border-sheen" aria-hidden="true"></div>
       <div className="hf-card-sweep" aria-hidden="true"></div>
       <div className="hf-card-flash" aria-hidden="true"></div>
+      <div className="hf-card-hype-glow" aria-hidden="true"></div>
       <div className="hf-card-ray-layer" aria-hidden="true">
         <span className="hf-card-ray"></span>
         <span className="hf-card-ray"></span>
