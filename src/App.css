@@ -39,6 +39,48 @@
   min-height: 100vh;
 }
 
+.obs-solo-shell {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.solo-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+}
+
+.solo-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(76, 137, 255, 0.18), rgba(0, 0, 0, 0));
+}
+
+.solo-reveal-card {
+  width: min(460px, 80vw);
+  height: min(620px, 86vh);
+}
+
+.solo-stage.phase-intro-back {
+  opacity: 1;
+  animation: solo-intro-in 420ms ease-out 1;
+}
+
+.solo-stage.phase-reveal-flip,
+.solo-stage.phase-front-hold {
+  opacity: 1;
+}
+
+.solo-stage.phase-outro {
+  opacity: 1;
+  animation: solo-outro-out 700ms ease-in 1 forwards;
+}
+
 .obs-card-grid {
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
 }
@@ -857,6 +899,32 @@
   }
 }
 
+@keyframes solo-intro-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(16px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes solo-outro-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.93);
+    filter: blur(5px);
+  }
+}
+
 @keyframes reveal-card-pop {
   0% {
     opacity: 0;
@@ -1114,6 +1182,11 @@ button:disabled {
 }
 
 @media (max-width: 960px) {
+  .solo-reveal-card {
+    width: min(360px, 88vw);
+    height: min(520px, 84vh);
+  }
+
   .focused-reveal-card {
     width: min(360px, 92vw);
     height: min(500px, 80vh);

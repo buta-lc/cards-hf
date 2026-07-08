@@ -4,6 +4,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminCards from './pages/AdminCards'
 import AdminLogin from './pages/AdminLogin'
 import ObsOverlay from './pages/ObsOverlay'
+import ObsSoloReveal from './pages/ObsSoloReveal'
 import PublicBoard from './pages/PublicBoard'
 import './App.css'
 
@@ -13,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<PublicBoard />} />
         <Route path="/obs" element={<ObsOverlay />} />
+        <Route path="/obs-solo" element={<ObsSoloReveal />} />
         <Route path="/admin/login" element={<AdminLogin />} />
 
         <Route element={<ProtectedAdminRoute />}>
