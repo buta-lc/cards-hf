@@ -98,7 +98,7 @@ export default function Card({
   )
 
   const previousRevealed = useRef(revealed)
-  const previousRevealSignal = useRef(revealSignal)
+  const previousRevealSignal = useRef(0)
   const [isRevealAnimating, setIsRevealAnimating] = useState(false)
   const [isHypeWindow, setIsHypeWindow] = useState(false)
   const [particles, setParticles] = useState([])
