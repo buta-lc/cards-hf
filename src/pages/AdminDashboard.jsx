@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [actionAttributionId, setActionAttributionId] = useState('')
 
   const attributedCardIds = new Set(
     attributions
@@ -135,53 +136,52 @@ export default function AdminDashboard() {
   }
 
   async function validateAttribution(attributionId) {
-    const { error: validateError } = await supabase
-      .from('attributions')
-      .update({
-        status: 'validated',
-        validated_at: new Date().toISOString(),
-        validated_by: user?.id,
-      })
-      .eq('id', attributionId)
-
-    if (validateError) {
-      setError(validateError.message)
-      return
-    }
-
-    await loadData()
+    await patchAttribution(attributionId, {
+      status: 'validated',
+      validated_at: new Date().toISOString(),
+      validated_by: user?.id,
+    })
   }
 
   async function revealAttribution(attributionId) {
-    const { error: revealError } = await supabase
-      .from('attributions')
-      .update({
-        revealed_at: new Date().toISOString(),
-      })
-      .eq('id', attributionId)
-
-    if (revealError) {
-      setError(revealError.message)
-      return
-    }
-
-    await loadData()
+    await patchAttribution(attributionId, {
+      status: 'validated',
+      revealed_at: new Date().toISOString(),
+    })
   }
 
   async function hideAttribution(attributionId) {
-    const { error: hideError } = await supabase
+    await patchAttribution(attributionId, {
+      revealed_at: null,
+    })
+  }
+
+  async function revertToLocked(attributionId) {
+    await patchAttribution(attributionId, {
+      status: 'locked',
+      validated_at: null,
+      validated_by: null,
+      revealed_at: null,
+    })
+  }
+
+  async function patchAttribution(attributionId, patch) {
+    setActionAttributionId(attributionId)
+    setError('')
+
+    const { error: patchError } = await supabase
       .from('attributions')
-      .update({
-        revealed_at: null,
-      })
+      .update(patch)
       .eq('id', attributionId)
 
-    if (hideError) {
-      setError(hideError.message)
+    if (patchError) {
+      setError(patchError.message)
+      setActionAttributionId('')
       return
     }
 
     await loadData()
+    setActionAttributionId('')
   }
 
   async function handleSignOut() {
@@ -303,6 +303,7 @@ export default function AdminDashboard() {
           {lockedAttributions.map((attribution) => {
             const isValidated = attribution.status === 'validated'
             const isRevealed = Boolean(attribution.revealed_at)
+            const isBusy = actionAttributionId === attribution.id
             const cardData = attributionToCardData(attribution)
 
             return (
@@ -321,17 +322,25 @@ export default function AdminDashboard() {
                     <button
                       type="button"
                       onClick={() => validateAttribution(attribution.id)}
-                      disabled={isValidated}
+                      disabled={isValidated || isBusy}
                     >
-                      Valider
+                      {isBusy ? 'Traitement...' : 'Valider'}
                     </button>
                     <button
                       type="button"
                       className="secondary"
                       onClick={() => revealAttribution(attribution.id)}
-                      disabled={!isValidated || isRevealed}
+                      disabled={!isValidated || isRevealed || isBusy}
                     >
                       Reveler maintenant
+                    </button>
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={() => revertToLocked(attribution.id)}
+                      disabled={isBusy}
+                    >
+                      Revenir locked
                     </button>
                   </div>
                 </div>
@@ -345,6 +354,7 @@ export default function AdminDashboard() {
         <h2>Validees pretes a reveler ({validatedNotRevealed.length})</h2>
         <ul className="attrib-list">
           {validatedNotRevealed.map((attribution) => {
+            const isBusy = actionAttributionId === attribution.id
             const cardData = attributionToCardData(attribution)
 
             return (
@@ -360,8 +370,17 @@ export default function AdminDashboard() {
                       type="button"
                       className="secondary"
                       onClick={() => revealAttribution(attribution.id)}
+                      disabled={isBusy}
                     >
-                      Reveler maintenant
+                      {isBusy ? 'Traitement...' : 'Reveler maintenant'}
+                    </button>
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={() => revertToLocked(attribution.id)}
+                      disabled={isBusy}
+                    >
+                      Revenir locked
                     </button>
                   </div>
                 </div>
@@ -375,6 +394,7 @@ export default function AdminDashboard() {
         <h2>Deja revelees ({revealedAttributions.length})</h2>
         <ul className="attrib-list">
           {revealedAttributions.map((attribution) => {
+            const isBusy = actionAttributionId === attribution.id
             const cardData = attributionToCardData(attribution)
 
             return (
@@ -390,8 +410,24 @@ export default function AdminDashboard() {
                       type="button"
                       className="danger"
                       onClick={() => hideAttribution(attribution.id)}
+                      disabled={isBusy}
                     >
-                      Recacher
+                      {isBusy ? 'Traitement...' : 'Recacher'}
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary"
+                      onClick={() => validateAttribution(attribution.id)}
+                      disabled={isBusy}
+                    >
+                      Repasser valide
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => revertToLocked(attribution.id)}
+                      disabled={isBusy}
+                    >
+                      Revenir locked
                     </button>
                   </div>
                 </div>

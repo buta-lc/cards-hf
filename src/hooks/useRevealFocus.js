@@ -10,10 +10,21 @@ export function useRevealFocus(items, options = {}) {
   const [focusPhase, setFocusPhase] = useState('idle')
 
   const previousMapRef = useRef(new Map())
+  const hasHydratedRef = useRef(false)
   const showTimerRef = useRef(null)
   const hideTimerRef = useRef(null)
 
   useEffect(() => {
+    if (!hasHydratedRef.current) {
+      const bootstrapMap = new Map()
+      for (const item of items || []) {
+        bootstrapMap.set(item.id, Boolean(item?.revealed_at))
+      }
+      previousMapRef.current = bootstrapMap
+      hasHydratedRef.current = true
+      return
+    }
+
     let nextReveal = null
 
     for (const item of items || []) {

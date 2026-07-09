@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import Card from '../components/Card'
 import { useRevealFocus } from '../hooks/useRevealFocus'
 import { sortAttributions } from '../lib/attributionSort'
+import { getRevealSoundUrl } from '../lib/backStyle'
 import { usePublicAttributions } from '../hooks/usePublicAttributions'
 import { ACTIVE_SEASON } from '../lib/constants'
 
@@ -12,15 +13,35 @@ export default function ObsOverlay() {
   const revealAudioRef = useRef(null)
 
   const sortedItems = useMemo(() => sortAttributions(items, 'default', 'asc'), [items])
+  const fallbackSoundUrl = import.meta.env.VITE_REVEAL_SOUND_URL || ''
 
-  const onReveal = useCallback(() => {
-    if (!revealAudioRef.current) {
-      return
-    }
+  const onReveal = useCallback(
+    (item) => {
+      const soundUrl = getRevealSoundUrl(item, fallbackSoundUrl)
+      if (!soundUrl) {
+        return
+      }
 
-    revealAudioRef.current.currentTime = 0
-    revealAudioRef.current.play().catch(() => {})
-  }, [])
+      if (!revealAudioRef.current) {
+        const audio = new Audio()
+        audio.preload = 'auto'
+        revealAudioRef.current = audio
+      }
+
+      const audio = revealAudioRef.current
+      if (!audio) {
+        return
+      }
+
+      if (audio.src !== soundUrl) {
+        audio.src = soundUrl
+      }
+
+      audio.currentTime = 0
+      audio.play().catch(() => {})
+    },
+    [fallbackSoundUrl],
+  )
 
   const { focusedReveal, revealSignal, isFocusMode, focusPhase } = useRevealFocus(sortedItems, {
     displayMs: 5000,
@@ -29,18 +50,12 @@ export default function ObsOverlay() {
   })
 
   useEffect(() => {
-    const revealSoundUrl = import.meta.env.VITE_REVEAL_SOUND_URL || ''
-    if (!revealSoundUrl) {
-      revealAudioRef.current = null
-      return
-    }
-
-    const audio = new Audio(revealSoundUrl)
-    audio.preload = 'auto'
-    revealAudioRef.current = audio
-
     return () => {
-      audio.pause()
+      if (!revealAudioRef.current) {
+        return
+      }
+
+      revealAudioRef.current.pause()
       revealAudioRef.current = null
     }
   }, [])

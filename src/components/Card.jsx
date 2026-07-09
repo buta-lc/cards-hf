@@ -1,33 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-
-const FALLBACK_BACK_STYLE = {
-  color: '#1f2937',
-  icon: '*',
-  title: 'Haut-fait',
-  image_url: '',
-}
-
-function normalizeBackStyle(backStyle) {
-  if (!backStyle) {
-    return FALLBACK_BACK_STYLE
-  }
-
-  let source = backStyle
-  if (typeof backStyle === 'string') {
-    try {
-      source = JSON.parse(backStyle)
-    } catch {
-      source = {}
-    }
-  }
-
-  return {
-    color: source.color || FALLBACK_BACK_STYLE.color,
-    icon: source.icon || FALLBACK_BACK_STYLE.icon,
-    title: source.title || FALLBACK_BACK_STYLE.title,
-    image_url: source.image_url || '',
-  }
-}
+import { normalizeBackStyle } from '../lib/backStyle'
 
 function createRevealParticles(rarity) {
   if (rarity !== 'rare' && rarity !== 'epique' && rarity !== 'legendaire') {
