@@ -12,6 +12,7 @@ export function useSoloRevealSequence(items, options = {}) {
   const [revealSignal, setRevealSignal] = useState(0)
 
   const previousMapRef = useRef(new Map())
+  const hasHydratedRef = useRef(false)
   const timersRef = useRef([])
 
   function clearTimers() {
@@ -22,6 +23,16 @@ export function useSoloRevealSequence(items, options = {}) {
   }
 
   useEffect(() => {
+    if (!hasHydratedRef.current) {
+      const bootstrapMap = new Map()
+      for (const item of items || []) {
+        bootstrapMap.set(item.id, Boolean(item?.revealed_at))
+      }
+      previousMapRef.current = bootstrapMap
+      hasHydratedRef.current = true
+      return
+    }
+
     const transitionedToRevealed = []
 
     for (const item of items || []) {
