@@ -3,6 +3,7 @@ export const DEFAULT_BACK_STYLE = {
   icon: '*',
   title: 'Haut-fait',
   image_url: '',
+  unlock_mode: 'public',
   reveal_sound_path: '',
   reveal_sound_url: '',
 }
@@ -26,6 +27,7 @@ export function normalizeBackStyle(backStyle) {
     icon: source.icon || DEFAULT_BACK_STYLE.icon,
     title: source.title || DEFAULT_BACK_STYLE.title,
     image_url: source.image_url || '',
+    unlock_mode: source.unlock_mode === 'hidden' ? 'hidden' : 'public',
     reveal_sound_path: source.reveal_sound_path || '',
     reveal_sound_url: source.reveal_sound_url || '',
   }

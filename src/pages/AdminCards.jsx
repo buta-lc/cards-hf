@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabaseClient'
 const defaultForm = {
   title: '',
   description: '',
+  unlockMode: 'public',
   rarity: 'commune',
   season: ACTIVE_SEASON,
   backColor: '#133047',
@@ -155,6 +156,7 @@ export default function AdminCards() {
         icon: form.backIcon,
         title: form.backTitle,
         image_url: form.backImageUrl,
+        unlock_mode: form.unlockMode,
         reveal_sound_path: form.revealSoundPath || '',
         reveal_sound_url: selectedSound?.url || '',
       },
@@ -242,6 +244,7 @@ export default function AdminCards() {
     setForm({
       title: card.title || '',
       description: card.description || '',
+      unlockMode: style.unlock_mode || 'public',
       rarity: card.rarity || 'commune',
       season: card.season || ACTIVE_SEASON,
       backColor: style.color || '#133047',
@@ -277,6 +280,7 @@ export default function AdminCards() {
       icon: form.backIcon,
       title: form.backTitle || 'Haut-fait',
       image_url: form.backImageUrl,
+      unlock_mode: form.unlockMode,
       reveal_sound_path: form.revealSoundPath,
       reveal_sound_url: selectedSound?.url || '',
     },
@@ -319,6 +323,17 @@ export default function AdminCards() {
               onChange={(event) => updateField('description', event.target.value)}
               required
             />
+          </label>
+
+          <label>
+            Methode de deverrouillage
+            <select
+              value={form.unlockMode}
+              onChange={(event) => updateField('unlockMode', event.target.value)}
+            >
+              <option value="public">Visible publiquement (description affichee)</option>
+              <option value="hidden">Cachee (logo/image comme indice)</option>
+            </select>
           </label>
 
           <label>
@@ -376,7 +391,7 @@ export default function AdminCards() {
             <input
               value={form.backImageUrl}
               onChange={(event) => updateField('backImageUrl', event.target.value)}
-              placeholder="https://..."
+              placeholder="https://... (logo recommande)"
             />
           </label>
 
@@ -499,6 +514,11 @@ export default function AdminCards() {
                 <strong>{card.title}</strong>
                 <p>
                   {card.rarity} - {card.season}
+                </p>
+                <p>
+                  {normalizeBackStyle(card.back_style).unlock_mode === 'hidden'
+                    ? 'Deverrouillage cache'
+                    : 'Deverrouillage public'}
                 </p>
               </div>
               <div className="row-actions">

@@ -68,6 +68,13 @@ export default function Card({
     () => normalizeBackStyle(attribution?.back_style),
     [attribution?.back_style],
   )
+  const isHiddenUnlock = backStyle.unlock_mode === 'hidden'
+  const backHintText = isHiddenUnlock
+    ? 'Methode cachee: logo = indice'
+    : description || 'Methode de deverrouillage affichee publiquement.'
+  const unlockDescription = isHiddenUnlock
+    ? 'Methode cachee. Observe le logo pour trouver l indice.'
+    : description || 'Methode visible prochainement.'
 
   const previousRevealed = useRef(revealed)
   const previousRevealSignal = useRef(0)
@@ -157,14 +164,6 @@ export default function Card({
             background: `linear-gradient(145deg, ${backStyle.color}, #111827)`,
           }}
         >
-          {backStyle.image_url ? (
-            <img
-              src={backStyle.image_url}
-              alt=""
-              className="hf-card-back-image"
-              loading="lazy"
-            />
-          ) : null}
           <div className="hf-card-back-ambient" aria-hidden="true">
             <span className="ambient-dot"></span>
             <span className="ambient-dot"></span>
@@ -172,8 +171,24 @@ export default function Card({
             <span className="ambient-dot"></span>
           </div>
           <div className="hf-card-back-content">
-            <span className="hf-card-back-icon">{backStyle.icon}</span>
-            <h3>{backStyle.title}</h3>
+            <div className="hf-card-back-logo-wrap" aria-hidden="true">
+              {backStyle.image_url ? (
+                <img
+                  src={backStyle.image_url}
+                  alt=""
+                  className="hf-card-back-logo-image"
+                  loading="lazy"
+                />
+              ) : (
+                <span className="hf-card-back-icon">{backStyle.icon}</span>
+              )}
+            </div>
+            <div className="hf-card-back-texts">
+              <h3>{backStyle.title}</h3>
+              <p className={`hf-card-back-hint ${isHiddenUnlock ? 'is-secret' : 'is-public'}`}>
+                {backHintText}
+              </p>
+            </div>
           </div>
         </section>
 
@@ -189,7 +204,7 @@ export default function Card({
             <p className="hf-rarity-pill">{rarity}</p>
             <h3>{title}</h3>
           </div>
-          <p className="hf-card-desc">{description}</p>
+          <p className="hf-card-desc">{unlockDescription}</p>
           <p className="hf-card-target">
             {targetType === 'team' ? 'Equipe' : 'Joueur'}: <strong>{targetName}</strong>
           </p>
